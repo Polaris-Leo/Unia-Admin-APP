@@ -8,7 +8,8 @@
     "build:frontend": "vite build --config frontend/vite.config.js",
     "build:backend": "node scripts/build-backend.mjs",
     "build": "npm run build:frontend && npm run build:backend",
-    "dist": "npm run build && electron-builder --win portable"
+    "dist": "npm run build && electron-builder --win portable",
+    "dist:setup": "npm run build && electron-builder --win nsis"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.7.0",
@@ -33,6 +34,7 @@
   "build": {
     "appId": "com.unia.admin",
     "productName": "Unia管理工具",
+    "icon": "ICON.ico",
     "files": [
       "electron/**",
       "resources/**",
@@ -40,6 +42,7 @@
     ],
     "asar": true,
     "win": {
+      "icon": "ICON.ico",
       "target": [
         {
           "target": "portable",
@@ -51,6 +54,17 @@
     },
     "portable": {
       "artifactName": "Unia-Admin.exe"
+    },
+    "nsis": {
+      "installerIcon": "ICON.ico",
+      "uninstallerIcon": "ICON.ico",
+      "installerHeaderIcon": "ICON.ico",
+      "artifactName": "Unia-Admin-Setup.exe",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Unia管理工具"
     }
   }
 }
