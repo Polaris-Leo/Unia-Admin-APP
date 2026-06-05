@@ -9,8 +9,6 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const isElectron = !!window.electronAPI;
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -60,16 +58,6 @@ export default function LoginPage() {
             {loading ? '登录中...' : '登录'}
           </button>
         </form>
-        {isElectron && (
-          <div className="auth-mode-switch-wrap">
-            <button
-              className="auth-mode-switch"
-              onClick={() => window.electronAPI.resetMode()}
-            >
-              更改服务器地址
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

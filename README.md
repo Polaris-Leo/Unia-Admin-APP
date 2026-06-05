@@ -1,6 +1,6 @@
 # Unia Admin APP
 
-B 站直播弹幕管理工具，基于 Electron + React 构建。连接已部署的 Unia 后端服务，支持实时弹幕监控、用户禁言/标签/备注、历史弹幕查询、透明悬浮窗等功能。
+B 站直播弹幕管理工具，基于 Electron + React 构建。支持实时弹幕监控、用户禁言/标签/备注、历史弹幕查询、透明悬浮窗等功能。
 
 ## 功能概览
 
@@ -28,9 +28,8 @@ B 站直播弹幕管理工具，基于 Electron + React 构建。连接已部署
 
 ## 环境要求
 
-- Node.js v18+
+- Node.js v18+（仅开发时需要）
 - Windows 10/11（macOS 理论可用，未针对性测试）
-- 已部署的 Unia 后端服务
 
 ## 快速开始
 
@@ -66,8 +65,7 @@ npm run dist:setup
 Unia-Admin-APP/
 ├── electron/               # Electron 主进程
 │   ├── main.js             # 窗口管理、IPC、托盘、应用生命周期
-│   ├── preload.js          # 渲染进程与主进程的桥接 API
-│   └── mode-select.html    # 首次启动的服务器地址输入页
+│   └── preload.js          # 渲染进程与主进程的桥接 API
 ├── frontend/               # React 前端
 │   └── src/
 │       ├── pages/

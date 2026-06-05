@@ -2,11 +2,13 @@
 
 process.env.NODE_NO_WARNINGS = '1';
 
-const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, shell } = require('electron');
 const path   = require('path');
 const fs     = require('fs');
 const net    = require('net');
 const http   = require('http');
+
+const BACKEND_URL = 'https://adminbot.unia.love';
 
 // ── 持久路径 ────────────────────────────────────────────────────────────────
 const USER_DATA   = app.getPath('userData');
@@ -110,48 +112,19 @@ function createOverlayWindow(url) {
   });
 }
 
-// ── 展示服务器地址输入页，返回 URL ───────────────────────────────────────────
-function runUrlSetup() {
-  return new Promise((resolve, reject) => {
-    mainWin.loadFile(path.join(__dirname, 'mode-select.html'));
-    mainWin.once('ready-to-show', () => mainWin.show());
-
-    const onSelect = (_, data) => {
-      mainWin.removeListener('closed', onClose);
-      resolve(data);
-    };
-    const onClose = () => {
-      ipcMain.removeListener('mode-select', onSelect);
-      reject(new Error('用户关闭了窗口'));
-    };
-
-    ipcMain.once('mode-select', onSelect);
-    mainWin.once('closed', onClose);
-  });
-}
-
 // ── 启动应用 ─────────────────────────────────────────────────────────────────
-async function launchApp(remoteUrl) {
+async function launchApp() {
   const distDir    = path.join(app.getAppPath(), 'resources', 'frontend-dist');
   frontendPort     = await startFrontendServer(distDir);
-  const enc        = encodeURIComponent(remoteUrl);
+  const enc        = encodeURIComponent(BACKEND_URL);
   const mainUrl    = `http://127.0.0.1:${frontendPort}/?mode=remote&backendUrl=${enc}`;
   const overlayUrl = `http://127.0.0.1:${frontendPort}/overlay?mode=remote&backendUrl=${enc}`;
 
   mainWin.loadURL(mainUrl);
-  if (!mainWin.isVisible()) mainWin.once('ready-to-show', () => mainWin.show());
+  mainWin.once('ready-to-show', () => mainWin.show());
 
   createOverlayWindow(overlayUrl);
   setupTray();
-}
-
-// ── 重置服务器地址并重启 ──────────────────────────────────────────────────────
-function resetAndRelaunch() {
-  const cfg = loadConfig();
-  delete cfg.remoteUrl;
-  saveConfig(cfg);
-  app.relaunch();
-  app.exit(0);
 }
 
 // ── 托盘 ─────────────────────────────────────────────────────────────────────
@@ -166,17 +139,6 @@ function setupTray() {
     { label: '显示主界面',     click: () => { mainWin?.show(); mainWin?.focus(); } },
     { label: '显示弹幕悬浮窗', click: () => { overlayWin?.show(); overlayWin?.focus(); } },
     { type: 'separator' },
-    {
-      label: '更改服务器地址（重启生效）', click: () => {
-        dialog.showMessageBox({
-          type: 'info', title: '更改服务器地址',
-          message: '将重置服务器地址并重启应用', buttons: ['确定', '取消'], cancelId: 1,
-        }).then(({ response }) => {
-          if (response === 0) resetAndRelaunch();
-        });
-      },
-    },
-    { type: 'separator' },
     { label: '退出', click: () => app.exit(0) },
   ]));
   tray.on('double-click', () => { mainWin?.show(); mainWin?.focus(); });
@@ -187,24 +149,10 @@ app.whenReady().then(async () => {
   Menu.setApplicationMenu(null);
   try {
     createMainWindow();
-    const cfg = loadConfig();
-    let remoteUrl;
-
-    if (cfg.remoteUrl) {
-      mainWin.loadFile(path.join(__dirname, 'mode-select.html'), { query: { autoConnect: '1' } });
-      mainWin.once('ready-to-show', () => mainWin.show());
-      remoteUrl = cfg.remoteUrl;
-    } else {
-      const result = await runUrlSetup();
-      remoteUrl = result.url;
-      saveConfig({ ...loadConfig(), remoteUrl });
-    }
-
-    await launchApp(remoteUrl);
+    await launchApp();
   } catch (e) {
-    if (e.message !== '用户关闭了窗口') {
-      dialog.showErrorBox('Unia 启动失败', String(e.message || e));
-    }
+    const { dialog } = require('electron');
+    dialog.showErrorBox('Unia 启动失败', String(e.message || e));
     app.quit();
   }
 });
@@ -222,7 +170,6 @@ ipcMain.handle('save-config', (_, d) => {
 });
 
 ipcMain.on('open-external', (_, url) => { if (url?.startsWith('https://')) shell.openExternal(url); });
-ipcMain.on('reset-mode',           () => resetAndRelaunch());
 ipcMain.on('close-window',         () => mainWin?.close());
 ipcMain.on('minimize-window',      () => mainWin?.minimize());
 ipcMain.on('toggle-always-on-top', (_, v) => mainWin?.setAlwaysOnTop(v, 'screen-saver'));

@@ -17,7 +17,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   openOverlay:    () => ipcRenderer.send('open-overlay'),
   openExternal:   (url) => ipcRenderer.send('open-external', url),
-  resetMode:      () => ipcRenderer.send('reset-mode'),
 
   // 主界面 → 悬浮窗：同步当前弹幕列表和连接状态
   sendOverlaySnapshot: (data) => ipcRenderer.send('overlay-snapshot', data),
@@ -38,7 +37,3 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 });
 
-// 服务器地址输入页专用 API（mode-select.html 中调用）
-contextBridge.exposeInMainWorld('modeSelectAPI', {
-  selectRemote: (url) => ipcRenderer.send('mode-select', { url }),
-});

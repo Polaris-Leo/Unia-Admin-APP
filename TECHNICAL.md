@@ -53,10 +53,7 @@
 app.whenReady()
   → Menu.setApplicationMenu(null)   // 移除原生菜单栏
   → createMainWindow()              // 创建主窗口（初始隐藏）
-  → 读取已保存的 remoteUrl
-      ├─ 已保存 → 展示连接中 loading 画面，直接连接
-      └─ 首次运行 → 展示 mode-select.html（URL 输入框）
-  → launchApp(remoteUrl)
+  → launchApp()
       → startFrontendServer()       // 启动内置静态文件服务
       → 加载前端，附带 ?mode=remote&backendUrl=...
   → createOverlayWindow(overlayUrl) // 创建悬浮窗（初始隐藏）
@@ -78,7 +75,6 @@ app.whenReady()
 |------|---------|------|
 | 渲染→主 | `load-config` | 读取持久化配置（invoke） |
 | 渲染→主 | `save-config` | 写入配置并广播给所有窗口（invoke） |
-| 渲染→主 | `reset-mode` | 清除保存的服务器地址并重启，重新进入 URL 输入 |
 | 渲染→主 | `open-overlay` | 同步 token 后展示悬浮窗 |
 | 渲染→主 | `overlay-snapshot` | 主界面推送弹幕快照给悬浮窗 |
 | 渲染→主 | `toggle-overlay-pin` | 切换悬浮窗置顶状态 |
@@ -95,7 +91,6 @@ app.whenReady()
 
 ```json
 {
-  "remoteUrl": "https://your-server.example.com",
   "mainX": 100, "mainY": 100, "mainWidth": 1200, "mainHeight": 800,
   "overlayX": 50, "overlayY": 100, "overlayWidth": 360, "overlayHeight": 580,
   "overlayOpacity": 0.85,
@@ -103,7 +98,7 @@ app.whenReady()
 }
 ```
 
-**重置服务器地址**：删除 `remoteUrl` 字段后重启，将重新弹出 URL 输入框。也可在应用内通过登录页底部链接、NavBar 用户菜单或系统托盘菜单触发。
+仅保存窗口位置/尺寸及悬浮窗设置，后端地址不需要配置。
 
 ---
 

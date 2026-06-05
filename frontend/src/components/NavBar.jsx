@@ -239,17 +239,6 @@ export default function NavBar() {
               }}>
                 修改账户信息
               </button>
-              {window.electronAPI && (
-                <>
-                  <div className="nav-dropdown-sep" />
-                  <button className="nav-dropdown-item" onClick={() => {
-                    setDropdownOpen(false);
-                    window.electronAPI.resetMode();
-                  }}>
-                    更改服务器地址
-                  </button>
-                </>
-              )}
               <div className="nav-dropdown-sep" />
               <button className="nav-dropdown-item nav-dropdown-danger" onClick={handleLogout}>
                 退出登录
