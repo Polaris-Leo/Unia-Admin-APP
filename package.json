@@ -1,0 +1,31 @@
+{
+  "name": "unia-overlay",
+  "version": "1.0.0",
+  "description": "Unia 弹幕透明悬浮窗（Electron）",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.unia.overlay",
+    "productName": "Unia弹幕悬浮窗",
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**"
+    ],
+    "win": {
+      "target": [
+        { "target": "portable", "arch": ["x64"] }
+      ]
+    },
+    "portable": {
+      "artifactName": "Unia-Overlay.exe"
+    }
+  }
+}
