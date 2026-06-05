@@ -48,9 +48,21 @@ npm start
 
 # 打包为单文件便携版 .exe
 npm run dist
+
+# 打包为 NSIS 安装包（带安装向导，创建桌面和开始菜单快捷方式）
+npm run dist:setup
 ```
 
-打包输出：`dist/Unia-Admin.exe`，无需安装 Node.js，双击运行。
+| 产物 | 命令 | 说明 |
+|------|------|------|
+| `dist/Unia-Admin.exe` | `npm run dist` | 便携版，单文件，双击直接运行 |
+| `dist/Unia-Admin-Setup.exe` | `npm run dist:setup` | 安装包，有安装向导，可自定义安装目录 |
+
+两者均无需在目标机器上安装 Node.js。
+
+## 下载
+
+前往 [Releases](https://github.com/Polaris-Leo/Unia-Admin-APP/releases) 页面下载最新版本。
 
 ## 项目结构
 
@@ -86,8 +98,10 @@ Unia-Admin-APP/
 ├── resources/              # 构建产物（构建后生成）
 │   ├── server.cjs          # 打包后的后端
 │   └── frontend-dist/      # 打包后的前端静态文件
-└── scripts/
-    └── build-backend.mjs   # 后端打包脚本（esbuild）
+├── scripts/
+│   └── build-backend.mjs   # 后端打包脚本（esbuild）
+├── ICON.png                # 应用图标源文件
+└── ICON.ico                # 应用图标（打包用）
 ```
 
 ## 技术文档

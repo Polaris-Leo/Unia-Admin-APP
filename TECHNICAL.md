@@ -227,9 +227,13 @@ npm run build:backend
 ### 打包为 exe
 
 ```bash
+# 便携版（单文件，双击直接运行）
 npm run dist
-# 等价于: npm run build && electron-builder --win portable
-# 输出: dist/Unia-Admin.exe（便携版，约 150-200 MB）
+# 输出: dist/Unia-Admin.exe（约 73 MB）
+
+# 安装包（NSIS 向导，创建桌面 / 开始菜单快捷方式）
+npm run dist:setup
+# 输出: dist/Unia-Admin-Setup.exe（约 80 MB）
 ```
 
 electron-builder 配置（`package.json` 中的 `build` 字段）：
@@ -238,10 +242,23 @@ electron-builder 配置（`package.json` 中的 `build` 字段）：
 {
   "appId": "com.unia.admin",
   "productName": "Unia管理工具",
+  "icon": "ICON.ico",
   "files": ["electron/**", "resources/**", "package.json"],
   "asar": true,
-  "win": { "target": [{ "target": "portable", "arch": ["x64"] }] },
-  "portable": { "artifactName": "Unia-Admin.exe" }
+  "win": {
+    "icon": "ICON.ico",
+    "target": [{ "target": "portable", "arch": ["x64"] }]
+  },
+  "portable": { "artifactName": "Unia-Admin.exe" },
+  "nsis": {
+    "installerIcon": "ICON.ico",
+    "artifactName": "Unia-Admin-Setup.exe",
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Unia管理工具"
+  }
 }
 ```
 
@@ -265,3 +282,4 @@ electron-builder 配置（`package.json` 中的 `build` 字段）：
 3. **调试**：`npm start` 直接启动 Electron，前端通过 Vite dev server 或预构建产物提供服务
 4. **IPC 安全**：所有渲染进程 API 通过 `contextBridge` 暴露，`contextIsolation: true`，禁用 `nodeIntegration`
 5. **外部链接**：跳转外部 URL 一律通过 `shell.openExternal` 由系统默认浏览器打开，防止在 Electron 内加载不受信任的页面
+6. **远程模式 backendUrl 持久化**：`initBackendUrl()` 解析到 `backendUrl` 后，同步写入 Electron 配置（`unia-config.json`）；`restoreElectronAuth()` 每次启动优先从配置恢复 `backendUrl`，避免 401 整页刷新后 URL 参数丢失导致请求回退到本地服务器
