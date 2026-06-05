@@ -5,9 +5,7 @@
   "main": "electron/main.js",
   "scripts": {
     "start": "electron .",
-    "build:frontend": "vite build --config frontend/vite.config.js",
-    "build:backend": "node scripts/build-backend.mjs",
-    "build": "npm run build:frontend && npm run build:backend",
+    "build": "vite build --config frontend/vite.config.js",
     "dist": "npm run build && electron-builder --win portable",
     "dist:setup": "npm run build && electron-builder --win nsis"
   },

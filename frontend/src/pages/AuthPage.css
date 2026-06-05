@@ -65,3 +65,23 @@
 
 .auth-btn:hover { opacity: 0.85; }
 .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.auth-mode-switch-wrap {
+  margin-top: 20px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.auth-mode-switch {
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
+}
+
+.auth-mode-switch:hover { color: var(--primary); }
