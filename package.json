@@ -1,31 +1,56 @@
 {
-  "name": "unia-overlay",
+  "name": "unia-admin",
   "version": "1.0.0",
-  "description": "Unia 弹幕透明悬浮窗（Electron）",
-  "main": "main.js",
+  "description": "Unia 弹幕管理工具（Electron）",
+  "main": "electron/main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win portable"
+    "build:frontend": "vite build --config frontend/vite.config.js",
+    "build:backend": "node scripts/build-backend.mjs",
+    "build": "npm run build:frontend && npm run build:backend",
+    "dist": "npm run build && electron-builder --win portable"
   },
   "devDependencies": {
-    "electron": "^32.0.0",
-    "electron-builder": "^25.0.0"
+    "@vitejs/plugin-react": "^4.7.0",
+    "axios": "^1.7.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "electron": "^34.0.0",
+    "electron-builder": "^25.0.0",
+    "esbuild": "^0.25.0",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "pako": "^2.1.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.16.0",
+    "uuid": "^10.0.0",
+    "vite": "^6.3.5",
+    "ws": "^8.17.1",
+    "xlsx": "^0.18.5"
   },
   "build": {
-    "appId": "com.unia.overlay",
-    "productName": "Unia弹幕悬浮窗",
+    "appId": "com.unia.admin",
+    "productName": "Unia管理工具",
     "files": [
-      "main.js",
-      "preload.js",
-      "renderer/**"
+      "electron/**",
+      "resources/**",
+      "package.json"
     ],
+    "asar": true,
     "win": {
       "target": [
-        { "target": "portable", "arch": ["x64"] }
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     },
     "portable": {
-      "artifactName": "Unia-Overlay.exe"
+      "artifactName": "Unia-Admin.exe"
     }
   }
 }

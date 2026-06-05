@@ -1,0 +1,204 @@
+.popup-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+}
+
+.popup {
+  position: fixed;
+  z-index: 1001;
+  background:
+    radial-gradient(circle at 0 0, rgba(251,114,153,0.12), transparent 42%),
+    var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 252px;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.42);
+  overflow: hidden;
+}
+
+.popup-toast {
+  position: absolute;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.popup-header {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px 10px;
+  background: linear-gradient(135deg, var(--bg-3), rgba(251,114,153,0.08));
+}
+
+.popup-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.popup-info { flex: 1; min-width: 0; }
+
+.popup-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.popup-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.popup-name:hover { color: var(--primary); }
+
+.popup-copy-btn {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--bg-2);
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+.popup-copy-btn:hover { color: var(--text); }
+
+.popup-uid-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+.popup-uid { font-size: 11px; color: var(--text-3); }
+.popup-copy-tiny { font-size: 10px; color: var(--text-3); }
+.popup-uid-row:hover .popup-uid { color: var(--text-2); }
+
+.popup-time { font-size: 10px; color: var(--text-3); }
+
+.popup-section { padding: 9px 12px; }
+.popup-section-label { font-size: 11px; color: var(--text-3); margin-bottom: 6px; }
+.popup-separator { height: 1px; background: var(--border); }
+
+.popup-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+.popup-tag {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  background: var(--primary-dim);
+  color: var(--primary);
+  border-radius: 20px;
+  font-size: 11px;
+}
+
+.popup-tag-del {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1;
+  padding: 0 1px;
+}
+.popup-tag-del:hover { color: var(--danger); }
+
+.popup-tag-add {
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px dashed var(--border);
+  color: var(--text-3);
+  font-size: 11px;
+  background: transparent;
+}
+.popup-tag-add:hover { border-color: var(--primary); color: var(--primary); }
+
+.popup-note {
+  font-size: 12px;
+  color: var(--text-2);
+  padding: 4px 8px;
+  background: var(--bg-3);
+  border-radius: var(--radius-sm);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+
+.popup-tag-input-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.popup-input {
+  flex: 1;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  color: var(--text);
+  font-size: 12px;
+  outline: none;
+}
+.popup-input:focus { border-color: var(--primary); }
+
+.popup-ban-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.popup-ban-btn {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,77,79,0.12);
+  color: var(--danger);
+  font-size: 12px;
+  border: 1px solid rgba(255,77,79,0.25);
+  transition: background 0.15s;
+}
+.popup-ban-btn:hover:not(:disabled) { background: var(--danger); color: #fff; }
+.popup-ban-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.popup-unban-btn {
+  margin-top: 8px;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(82,196,26,0.1);
+  color: var(--success);
+  font-size: 12px;
+  border: 1px solid rgba(82,196,26,0.25);
+  width: 100%;
+  text-align: center;
+}
+.popup-unban-btn:hover { background: var(--success); color: #fff; }
+
+.popup-actions { display: flex; flex-direction: column; gap: 2px; padding: 6px 4px; }
+
+.popup-action-item {
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-2);
+  background: transparent;
+  transition: background 0.1s, color 0.1s;
+  display: block;
+  width: 100%;
+}
+.popup-action-item:hover { background: var(--bg-3); color: var(--text); }

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Unia 管理工具</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #111; color: #e8e8e8;
+      height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-app-region: drag;
+      overflow: hidden;
+    }
+    .page {
+      width: 100%; max-width: 580px;
+      display: flex; flex-direction: column; align-items: center; gap: 36px;
+      padding: 0 32px;
+      -webkit-app-region: no-drag;
+    }
+
+    /* ── 品牌 ── */
+    .brand { text-align: center; }
+    .brand-name {
+      font-size: 40px; font-weight: 800; letter-spacing: -1px;
+      background: linear-gradient(135deg, #fb7299, #f0547a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .brand-sub  { font-size: 18px; font-weight: 500; color: #ccc; margin: 6px 0 4px; }
+    .brand-hint { font-size: 13px; color: #555; }
+
+    /* ── 模式卡片 ── */
+    .cards { display: flex; gap: 16px; width: 100%; }
+    .card {
+      flex: 1; background: #1a1a1a; border: 1.5px solid #2a2a2a;
+      border-radius: 14px; padding: 28px 20px 22px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.18s, background 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      text-align: center;
+    }
+    .card:hover { border-color: #fb7299; background: #1d1d1d; transform: translateY(-3px); }
+    .card-icon  { font-size: 32px; line-height: 1; }
+    .card-title { font-size: 16px; font-weight: 600; color: #e8e8e8; }
+    .card-desc  { font-size: 12px; color: #666; line-height: 1.7; }
+    .card-btn {
+      margin-top: 6px; padding: 8px 22px;
+      background: #fb7299; color: #fff;
+      border: none; border-radius: 20px; font-size: 13px;
+      cursor: pointer; transition: background 0.15s;
+      pointer-events: none;
+    }
+    .card:hover .card-btn { background: #f0547a; }
+
+    /* ── 远程模式 URL 表单 ── */
+    .remote-form {
+      display: none; flex-direction: column; gap: 10px; width: 100%;
+    }
+    .remote-form.open { display: flex; }
+    .form-label { font-size: 13px; color: #aaa; }
+    .form-input {
+      padding: 10px 14px; width: 100%;
+      background: #1a1a1a; border: 1.5px solid #333; border-radius: 8px;
+      color: #e8e8e8; font-size: 14px; outline: none;
+    }
+    .form-input:focus { border-color: #fb7299; }
+    .form-btns { display: flex; gap: 10px; }
+    .btn-back {
+      padding: 9px 18px; background: #222; border: 1.5px solid #333;
+      border-radius: 8px; color: #aaa; font-size: 14px; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-back:hover { background: #2a2a2a; color: #e8e8e8; }
+    .btn-connect {
+      flex: 1; padding: 9px; background: #fb7299; color: #fff;
+      border: none; border-radius: 8px; font-size: 14px;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .btn-connect:hover { background: #f0547a; }
+
+    /* ── 加载状态 ── */
+    .loading { display: none; flex-direction: column; align-items: center; gap: 14px; }
+    .loading.open { display: flex; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #2a2a2a; border-top-color: #fb7299;
+      border-radius: 50%; animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #888; font-size: 14px; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="brand">
+    <div class="brand-name">Unia</div>
+    <div class="brand-sub">弹幕管理工具</div>
+    <div class="brand-hint" id="hint">请选择运行模式</div>
+  </div>
+
+  <div class="cards" id="cards">
+    <div class="card" onclick="selectLocal()">
+      <div class="card-icon">🖥️</div>
+      <div class="card-title">本地模式</div>
+      <div class="card-desc">内嵌后端服务<br>扫码登录 B 站<br>无需额外服务器</div>
+      <div class="card-btn">选择本地模式</div>
+    </div>
+    <div class="card" onclick="showRemoteForm()">
+      <div class="card-icon">🌐</div>
+      <div class="card-title">远程模式</div>
+      <div class="card-desc">连接已部署的<br>Unia 后端服务器<br>Docker 用户适用</div>
+      <div class="card-btn">选择远程模式</div>
+    </div>
+  </div>
+
+  <form class="remote-form" id="remoteForm" onsubmit="submitRemote(event)">
+    <div class="form-label">后端服务器地址</div>
+    <input id="urlInput" class="form-input" type="url"
+      placeholder="http://localhost:3001" value="http://localhost:3001" autocomplete="off">
+    <div class="form-btns">
+      <button type="button" class="btn-back" onclick="hideRemoteForm()">← 返回</button>
+      <button type="submit" class="btn-connect">连接服务器</button>
+    </div>
+  </form>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">启动中，请稍候…</div>
+  </div>
+</div>
+<script>
+  /* ── 自动模式（已保存配置） ── */
+  const autoMode = new URLSearchParams(location.search).get('autoMode');
+  if (autoMode) {
+    document.getElementById('cards').style.display = 'none';
+    document.getElementById('hint').textContent = autoMode === 'local'
+      ? '正在启动本地服务…' : '正在连接远程服务器…';
+    document.getElementById('loading').classList.add('open');
+    document.getElementById('loadingText').textContent = autoMode === 'local'
+      ? '正在启动本地服务，请稍候…' : '正在连接远程服务器，请稍候…';
+  }
+
+  function showLoading(text) {
+    document.getElementById('cards').style.display = 'none';
+    document.getElementById('remoteForm').classList.remove('open');
+    document.getElementById('loading').classList.add('open');
+    document.getElementById('loadingText').textContent = text;
+  }
+
+  function selectLocal() {
+    showLoading('正在启动本地服务，请稍候…');
+    window.modeSelectAPI.selectLocal();
+  }
+
+  function showRemoteForm() {
+    document.getElementById('cards').style.display = 'none';
+    document.getElementById('remoteForm').classList.add('open');
+    setTimeout(() => {
+      const input = document.getElementById('urlInput');
+      input.focus(); input.select();
+    }, 30);
+  }
+
+  function hideRemoteForm() {
+    document.getElementById('remoteForm').classList.remove('open');
+    document.getElementById('cards').style.display = 'flex';
+  }
+
+  function submitRemote(e) {
+    e.preventDefault();
+    const url = document.getElementById('urlInput').value.trim();
+    if (!url) return;
+    showLoading('正在连接远程服务器，请稍候…');
+    window.modeSelectAPI.selectRemote(url);
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') hideRemoteForm();
+  });
+</script>
+</body>
+</html>

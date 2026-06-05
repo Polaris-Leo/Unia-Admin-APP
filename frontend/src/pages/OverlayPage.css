@@ -1,0 +1,314 @@
+/* ── Electron 悬浮窗专用：清掉全局 body 背景，保证透明窗口真正透明 ── */
+html.unia-overlay-page,
+body.unia-overlay-page,
+body.unia-overlay-page #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent !important;
+}
+
+:root {
+  --ov-bg-rgb: 12, 14, 18;
+  --ov-panel-rgb: 22, 24, 30;
+  --ov-line-rgb: 255, 255, 255;
+  --ov-text: #edf2ff;
+  --ov-text-2: #aeb7c8;
+  --ov-text-3: #697386;
+  --ov-primary: #fb7299;
+  --ov-bg-alpha: 0.85;
+  --ov-font-size: 14px;
+}
+
+/* ov-root = 整个悬浮窗 */
+.ov-root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--ov-text);
+  font-family: 'Segoe UI', 'Microsoft YaHei UI', system-ui, sans-serif;
+  font-size: 13px;
+  user-select: none;
+  border-radius: 10px;
+  border: 1px solid rgba(var(--ov-line-rgb), 0.10);
+  background:
+    linear-gradient(145deg, rgba(var(--ov-bg-rgb), var(--ov-bg-alpha)), rgba(9, 10, 14, var(--ov-bg-alpha)));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* 弹窗在悬浮窗内：禁止拖拽触发窗口移动，允许文字选中 */
+.ov-root .popup-overlay,
+.ov-root .popup {
+  -webkit-app-region: no-drag;
+  user-select: text;
+}
+
+/* ── 标题栏 ── */
+.ov-header {
+  -webkit-app-region: drag;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding: 0 8px 0 10px;
+  background: rgba(var(--ov-panel-rgb), calc(var(--ov-bg-alpha) * 0.92));
+  border-bottom: 1px solid rgba(var(--ov-line-rgb), 0.08);
+  flex-shrink: 0;
+}
+.ov-header-left,
+.ov-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.ov-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ov-text-3);
+  flex-shrink: 0;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.ov-dot.connected {
+  background: #52c41a;
+  box-shadow: 0 0 9px rgba(82, 196, 26, 0.75);
+}
+.ov-dot.disconnected {
+  background: #ff4d4f;
+  box-shadow: 0 0 9px rgba(255, 77, 79, 0.45);
+}
+.ov-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ov-text);
+  white-space: nowrap;
+}
+.ov-count {
+  font-size: 11px;
+  color: var(--ov-text-3);
+  white-space: nowrap;
+}
+
+/* ── 按钮 ── */
+.ov-icon-btn,
+.ov-win-btn {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--ov-text-3);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.ov-icon-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.ov-win-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+.ov-icon-btn:hover,
+.ov-win-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--ov-text);
+}
+.ov-icon-btn.active {
+  color: var(--ov-primary);
+  background: rgba(251, 114, 153, 0.12);
+}
+.ov-pin-svg {
+  width: 17px;
+  height: 17px;
+  display: block;
+  fill: currentColor;
+}
+.ov-win-btn.close:hover {
+  background: #e81123;
+  color: #fff;
+}
+
+.no-drag { -webkit-app-region: no-drag; }
+.drag    { -webkit-app-region: drag; }
+
+/* ── 弹幕列表 ── */
+.ov-list-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.ov-list {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.14) transparent;
+}
+
+/* Grid 布局：左列头像（占两行），右列上下两行 */
+.ov-row {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 7px;
+  row-gap: 1px;
+  padding: 4px 8px 5px;
+  transition: background 0.1s;
+}
+.ov-row:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+/* 头像：跨两行，居中对齐 */
+.ov-avatar-slot {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  align-self: center;
+  flex-shrink: 0;
+}
+.ov-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 第一行：时间 + 用户名 */
+.ov-row-meta {
+  grid-row: 1;
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.ov-user {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  max-width: 100%;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+.ov-user:hover .ov-username {
+  color: var(--ov-primary);
+}
+.ov-guard {
+  font-size: 0.72em;
+  padding: 0 3px;
+  border-radius: 3px;
+  color: #fff;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ov-username {
+  color: var(--ov-text-2);
+  font-size: 0.88em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 10em;
+  flex-shrink: 0;
+}
+
+/* 第二行：弹幕内容 */
+.ov-content {
+  grid-row: 2;
+  grid-column: 2;
+  color: var(--ov-text);
+  word-break: break-all;
+  min-width: 0;
+  font-size: 0.93em;
+}
+.ov-emote {
+  height: 1.35em;
+  vertical-align: middle;
+  object-fit: contain;
+}
+.ov-emote-big { height: 2.5em; }
+
+/* ── 分隔线 ── */
+.ov-divider {
+  text-align: center;
+  color: var(--ov-text-3);
+  font-size: 11px;
+  padding: 5px 0;
+  position: relative;
+}
+.ov-divider::before,
+.ov-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 28%;
+  height: 1px;
+  background: rgba(255,255,255,0.10);
+}
+.ov-divider::before { left: 8px; }
+.ov-divider::after  { right: 8px; }
+
+/* ── 空状态 ── */
+.ov-empty {
+  position: absolute;
+  inset: 36px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  pointer-events: none;
+  color: var(--ov-text-3);
+}
+.ov-empty-orb {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, #fb7299 42%, transparent 72%);
+  opacity: 0.55;
+  filter: blur(0.2px);
+}
+.ov-empty-title {
+  color: var(--ov-text-2);
+  font-weight: 700;
+  font-size: 13px;
+}
+.ov-empty-desc {
+  color: var(--ov-text-3);
+  font-size: 12px;
+}
+
+/* ── 新消息按钮 ── */
+.ov-new-msg {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ov-primary);
+  color: #fff;
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+  white-space: nowrap;
+  z-index: 10;
+}

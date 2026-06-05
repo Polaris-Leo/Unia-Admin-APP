@@ -1,0 +1,116 @@
+.banlog-page {
+  display: flex; flex-direction: column; height: 100%; overflow: hidden;
+  padding: 0;
+}
+
+.banlog-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-2);
+  flex-shrink: 0;
+}
+.banlog-title { font-size: 15px; font-weight: 600; flex-shrink: 0; }
+.banlog-total { font-size: 12px; color: var(--text-3); flex-shrink: 0; }
+
+.banlog-filters {
+  display: flex; gap: 8px; align-items: center;
+  margin-left: auto;
+}
+
+.banlog-input {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  color: var(--text);
+  font-size: 12px;
+  outline: none;
+  width: 130px;
+}
+.banlog-input:focus { border-color: var(--primary); }
+
+.banlog-search-btn {
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+.banlog-search-btn:hover { opacity: 0.85; }
+
+.banlog-table-wrap {
+  flex: 1; overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.banlog-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 12px;
+}
+
+.banlog-table th {
+  padding: 8px 12px;
+  background: var(--bg-3);
+  color: var(--text-2);
+  font-weight: 500;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 1;
+}
+
+.banlog-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.banlog-table tr:hover td { background: var(--bg-3); }
+.banlog-row-unsilenced td { opacity: 0.5; }
+
+.banlog-time { color: var(--text-3); font-size: 11px; white-space: nowrap; }
+.banlog-user-link { color: var(--text); }
+.banlog-user-link:hover { color: var(--primary); }
+.banlog-uid { color: var(--text-3); }
+.banlog-content { color: var(--text-2); max-width: 200px; word-break: break-all; }
+
+.banlog-hours { color: var(--danger); }
+.banlog-hours-perm { font-weight: 700; }
+
+.banlog-unsilenced-tag {
+  font-size: 11px; color: var(--text-3);
+  background: var(--bg-3);
+  padding: 2px 8px; border-radius: 20px;
+}
+
+.banlog-unban-btn {
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(82,196,26,0.1);
+  color: var(--success);
+  font-size: 11px;
+  border: 1px solid rgba(82,196,26,0.3);
+}
+.banlog-unban-btn:hover { background: var(--success); color: #fff; }
+
+.banlog-loading { text-align: center; padding: 40px; color: var(--text-3); }
+
+.banlog-pagination {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 10px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.banlog-pagination button {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-3);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  font-size: 12px;
+}
+.banlog-pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+.banlog-pagination button:not(:disabled):hover { color: var(--primary); border-color: var(--primary); }
+.banlog-pagination span { font-size: 12px; color: var(--text-3); }
