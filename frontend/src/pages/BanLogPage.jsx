@@ -94,9 +94,13 @@ export default function BanLogPage() {
                 <td className="banlog-time">{formatTs(row.created_at)}</td>
                 <td>{row.mod_name}</td>
                 <td>
-                  <a href={`https://space.bilibili.com/${row.target_uid}`} target="_blank" rel="noopener noreferrer" className="banlog-user-link">
+                  <button className="banlog-user-link" onClick={() => {
+                    const url = `https://space.bilibili.com/${row.target_uid}`;
+                    if (window.electronAPI?.openExternal) window.electronAPI.openExternal(url);
+                    else window.open(url, '_blank', 'noopener,noreferrer');
+                  }}>
                     {row.target_uid}
-                  </a>
+                  </button>
                 </td>
                 <td>{row.target_name}</td>
                 <td className="banlog-content">{row.trigger_content || '—'}</td>
