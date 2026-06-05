@@ -11,6 +11,12 @@ async function restoreElectronAuth() {
   if (!window.electronAPI) return;
   try {
     const cfg = await window.electronAPI.loadConfig();
+    // 远程模式下先恢复 backendUrl，确保 API 请求打到正确服务器
+    if (cfg.backendUrl) {
+      localStorage.setItem('backendUrl', cfg.backendUrl);
+    } else {
+      localStorage.removeItem('backendUrl');
+    }
     if (cfg.authToken && !localStorage.getItem('token')) {
       localStorage.setItem('token', cfg.authToken);
     }

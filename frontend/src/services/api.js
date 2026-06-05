@@ -8,9 +8,19 @@ function initBackendUrl() {
   const mode = params.get('mode');
   const url = params.get('backendUrl');
   if (url) {
-    localStorage.setItem('backendUrl', url.replace(/\/$/, ''));
+    const clean = url.replace(/\/$/, '');
+    localStorage.setItem('backendUrl', clean);
+    // 持久化到 Electron 配置，确保整页刷新后仍能恢复
+    if (window.electronAPI) {
+      window.electronAPI.loadConfig()
+        .then(cfg => window.electronAPI.saveConfig({ ...cfg, backendUrl: clean }))
+        .catch(() => {});
+    }
   } else if (window.electronAPI && mode === 'local') {
     localStorage.removeItem('backendUrl');
+    window.electronAPI.loadConfig()
+      .then(cfg => window.electronAPI.saveConfig({ ...cfg, backendUrl: null }))
+      .catch(() => {});
   }
 }
 initBackendUrl();
@@ -43,7 +53,10 @@ api.interceptors.response.use(
           .then(cfg => window.electronAPI.saveConfig({ ...cfg, authToken: null }))
           .catch(() => {});
       }
-      window.location.href = '/login';
+      // 用 hash 跳转而非整页刷新，避免 URL query params 丢失导致 backendUrl 无法从 URL 恢复
+      if (window.location.pathname !== '/login') {
+        window.location.replace('/login');
+      }
     }
     return Promise.reject(err);
   }
