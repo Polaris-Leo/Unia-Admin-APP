@@ -51,9 +51,11 @@ npm run dist:setup
 | 产物 | 命令 | 说明 |
 |------|------|------|
 | `dist/Unia-Admin.exe` | `npm run dist` | 便携版，单文件，双击直接运行 |
-| `dist/Unia-Admin-Setup.exe` | `npm run dist:setup` | 安装包，有安装向导，可自定义安装目录 |
+| `dist/Unia-Admin-Setup.exe` | `npm run dist:setup` | 安装包，有安装向导，可自定义安装目录，支持原位更新 |
 
 两者均无需在目标机器上安装 Node.js。
+
+> **安装包更新说明**：`Unia-Admin-Setup.exe` 支持直接覆盖旧版更新，无需先卸载。运行新版安装包时会自动检测已安装版本，提示确认后关闭旧程序并安装到原目录。
 
 ## 下载
 
