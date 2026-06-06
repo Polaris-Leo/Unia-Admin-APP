@@ -163,6 +163,13 @@ DanmakuPage（主窗口）
 - 标题栏锁定按钮切换 `locked` state，为 `ov-root` 添加 `ov-locked` class
 - 锁定时通过 CSS `pointer-events: none` 禁用标题栏左侧、弹幕列表、置顶和窗口控制按钮的所有交互
 - 锁定按钮本身始终保持 `pointer-events: auto`，确保可随时解锁
+- 锁定时调用 `setIgnoreMouseEvents(true, { forward: true })`，鼠标点击穿透到后方程序；鼠标悬停至锁定按钮时临时恢复响应
+
+**自动滚动**
+- 使用 `progScrollRef` 标志位：程序触发滚动期间屏蔽 `scroll` 事件，防止子像素误差误关自动滚动
+- 用 `requestAnimationFrame` 包裹 `scrollTop` 赋值，确保 DOM 布局完成后再读取 `scrollHeight`
+- "底部判定"阈值统一为 100px
+- 离开最新位置时始终显示浮动按钮：有新消息显示条数，无新消息显示「回到最新位置」
 
 ---
 

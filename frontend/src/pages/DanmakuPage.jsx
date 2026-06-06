@@ -80,6 +80,7 @@ function PipView({ danmakuList, roomId, fontSize, onBanSuccess, onFilterUser, on
   const listRef = useRef(null);
   const isAutoScrollRef = useRef(true);
   const prevLengthRef = useRef(0);
+  const progScrollRef = useRef(false);
   const [isAutoScroll, setIsAutoScroll] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -91,33 +92,40 @@ function PipView({ danmakuList, roomId, fontSize, onBanSuccess, onFilterUser, on
     const curr = danmakuList.length;
     prevLengthRef.current = curr;
     if (curr < prev) {
-      // 列表被重置（断线重连）
       setUnreadCount(0);
       isAutoScrollRef.current = true;
       setIsAutoScroll(true);
       return;
     }
     if (isAutoScrollRef.current && listRef.current) {
-      listRef.current.scrollTop = listRef.current.scrollHeight;
+      progScrollRef.current = true;
+      requestAnimationFrame(() => {
+        if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+        requestAnimationFrame(() => { progScrollRef.current = false; });
+      });
     } else if (curr > prev) {
       setUnreadCount(c => c + (curr - prev));
     }
   }, [danmakuList]);
 
   const handleScroll = () => {
+    if (progScrollRef.current) return;
     const el = listRef.current;
     if (!el) return;
-    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
     isAutoScrollRef.current = atBottom;
     setIsAutoScroll(atBottom);
     if (atBottom) setUnreadCount(0);
   };
 
   const scrollToBottom = () => {
-    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+    if (!listRef.current) return;
+    progScrollRef.current = true;
+    listRef.current.scrollTop = listRef.current.scrollHeight;
     isAutoScrollRef.current = true;
     setIsAutoScroll(true);
     setUnreadCount(0);
+    requestAnimationFrame(() => { progScrollRef.current = false; });
   };
 
   const handleUserClick = (e, user, msg) => {
@@ -169,9 +177,9 @@ function PipView({ danmakuList, roomId, fontSize, onBanSuccess, onFilterUser, on
             );
           })}
         </div>
-        {!isAutoScroll && unreadCount > 0 && (
+        {!isAutoScroll && (
           <button className="pip-new-msg-btn" onClick={scrollToBottom}>
-            ↓ {unreadCount} 条新消息
+            {unreadCount > 0 ? `${unreadCount} 条新消息` : '回到最新位置'}
           </button>
         )}
       </div>
@@ -237,6 +245,7 @@ export default function DanmakuPage() {
   const wsRef = useRef(null);
   const listRef = useRef(null);
   const isAutoScrollRef = useRef(true);
+  const progScrollRef = useRef(false);
   const reconnectRef = useRef(null);
   const reconnectCount = useRef(0);
 
@@ -431,11 +440,16 @@ export default function DanmakuPage() {
 
   useEffect(() => {
     if (!isAutoScrollRef.current || !listRef.current) return;
-    if (scrollDirRef.current === 'up') {
-      listRef.current.scrollTop = listRef.current.scrollHeight;
-    } else {
-      listRef.current.scrollTop = 0;
-    }
+    progScrollRef.current = true;
+    requestAnimationFrame(() => {
+      if (!listRef.current) return;
+      if (scrollDirRef.current === 'up') {
+        listRef.current.scrollTop = listRef.current.scrollHeight;
+      } else {
+        listRef.current.scrollTop = 0;
+      }
+      requestAnimationFrame(() => { progScrollRef.current = false; });
+    });
   }, [danmakuList]);
 
   const handleScroll = () => {
@@ -443,20 +457,23 @@ export default function DanmakuPage() {
     if (!el) return;
     let atEdge, nearOldEnd;
     if (scrollDirRef.current === 'up') {
-      atEdge = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+      atEdge = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
       nearOldEnd = el.scrollTop < 120;
     } else {
-      atEdge = el.scrollTop < 80;
+      atEdge = el.scrollTop < 100;
       nearOldEnd = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
     }
-    isAutoScrollRef.current = atEdge;
-    setIsAutoScroll(atEdge);
-    if (atEdge) setUnreadCount(0);
+    if (!progScrollRef.current) {
+      isAutoScrollRef.current = atEdge;
+      setIsAutoScroll(atEdge);
+      if (atEdge) setUnreadCount(0);
+    }
     if (nearOldEnd) loadOlderItems();
   };
 
   const scrollToEdge = () => {
     if (!listRef.current) return;
+    progScrollRef.current = true;
     if (scrollDirRef.current === 'up') {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     } else {
@@ -465,6 +482,7 @@ export default function DanmakuPage() {
     isAutoScrollRef.current = true;
     setIsAutoScroll(true);
     setUnreadCount(0);
+    requestAnimationFrame(() => { progScrollRef.current = false; });
   };
 
   const handleReconnect = async () => {
@@ -784,9 +802,9 @@ export default function DanmakuPage() {
               <div className="dm-loading-older"><span className="dm-loading-spinner" />加载更早的消息</div>
             )}
           </div>
-          {!isAutoScroll && unreadCount > 0 && (
+          {!isAutoScroll && (
             <button className="dm-new-msg-btn" onClick={scrollToEdge}>
-              {scrollDir === 'up' ? '↓' : '↑'} {unreadCount} 条新消息
+              {unreadCount > 0 ? `${unreadCount} 条新消息` : '回到最新位置'}
             </button>
           )}
         </div>
