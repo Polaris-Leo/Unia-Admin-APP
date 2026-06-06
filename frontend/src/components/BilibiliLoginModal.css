@@ -115,13 +115,36 @@
 .blmodal-refresh-link:hover:not(:disabled) { color: var(--primary); }
 .blmodal-refresh-link:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.blmodal-logout-section {
-  padding: 12px 16px;
-  display: flex; justify-content: center;
+.blmodal-authed-section {
+  padding: 16px 16px 14px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.blmodal-authed-info {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(82,196,26,0.07);
+  border: 1px solid rgba(82,196,26,0.25);
+}
+
+.blmodal-authed-icon {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--success);
+  color: #fff; font-size: 14px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.blmodal-authed-title { font-size: 13px; font-weight: 600; color: var(--success); }
+.blmodal-authed-uid   { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+.blmodal-authed-actions {
+  display: flex; gap: 8px; justify-content: flex-end;
 }
 
 .blmodal-logout-btn {
-  padding: 6px 20px;
+  padding: 6px 16px;
   border-radius: var(--radius-sm);
   background: rgba(255,77,79,0.1);
   color: var(--danger);
@@ -130,3 +153,13 @@
 }
 .blmodal-logout-btn:hover:not(:disabled) { background: var(--danger); color: #fff; }
 .blmodal-logout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.blmodal-relogin-btn {
+  padding: 6px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-3);
+  color: var(--text-2);
+  font-size: 12px;
+  border: 1px solid var(--border);
+}
+.blmodal-relogin-btn:hover { color: var(--primary); border-color: var(--primary); }

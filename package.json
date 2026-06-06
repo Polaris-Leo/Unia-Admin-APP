@@ -1,6 +1,6 @@
 {
   "name": "unia-admin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Unia 弹幕管理工具（Electron）",
   "main": "electron/main.js",
   "scripts": {

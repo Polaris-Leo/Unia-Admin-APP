@@ -10,10 +10,15 @@ const QR_STATUS = {
 };
 
 export default function BilibiliLoginModal({ cookieStatus, onClose, onLoginSuccess }) {
+  const isLocalAuthed = cookieStatus?.local?.authenticated;
+  const localUid = cookieStatus?.local?.uid;
+
   const [qrData, setQrData] = useState(null);
   const [statusCode, setStatusCode] = useState(86101);
   const [loading, setLoading] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  // 已登录时是否强制展示扫码区（用于切换账号）
+  const [showQR, setShowQR] = useState(!isLocalAuthed);
   const pollRef = useRef(null);
 
   const fetchQRCode = async () => {
@@ -46,10 +51,11 @@ export default function BilibiliLoginModal({ cookieStatus, onClose, onLoginSucce
     }, 2000);
   };
 
+  // 仅在未登录或用户主动展开扫码区时才生成二维码
   useEffect(() => {
-    fetchQRCode();
+    if (showQR) fetchQRCode();
     return () => clearInterval(pollRef.current);
-  }, []);
+  }, [showQR]);
 
   const handleLogout = async () => {
     setLogoutLoading(true);
@@ -60,9 +66,13 @@ export default function BilibiliLoginModal({ cookieStatus, onClose, onLoginSucce
     setLogoutLoading(false);
   };
 
+  const handleShowQR = () => {
+    setQrData(null);
+    setStatusCode(86101);
+    setShowQR(true);
+  };
+
   const status = QR_STATUS[statusCode] || { text: `状态: ${statusCode}`, type: 'wait' };
-  const isLocalAuthed = cookieStatus?.local?.authenticated;
-  const localUid = cookieStatus?.local?.uid;
 
   return (
     <div className="blmodal-overlay" onClick={onClose}>
@@ -99,42 +109,56 @@ export default function BilibiliLoginModal({ cookieStatus, onClose, onLoginSucce
 
         <div className="blmodal-divider" />
 
-        {/* 扫码区 */}
-        <div className="blmodal-qr-section">
-          <p className="blmodal-qr-tip">使用 B 站 APP 扫码登录（兜底 Cookie，优先级低于 BiliCookie 服务）</p>
-          <div className="blmodal-qr-wrap">
-            {loading && <div className="blmodal-qr-placeholder">生成中...</div>}
-            {!loading && qrData?.qrcode_image && (
-              <img
-                src={qrData.qrcode_image}
-                alt="B站扫码登录"
-                className={`blmodal-qr-img ${status.type === 'expired' ? 'expired' : ''}`}
-              />
-            )}
-            {status.type === 'expired' && (
-              <div className="blmodal-qr-expired-mask">
-                <button className="blmodal-refresh-btn" onClick={fetchQRCode}>点击刷新</button>
+        {/* 已登录且未主动展开扫码：展示已登录状态 */}
+        {isLocalAuthed && !showQR ? (
+          <div className="blmodal-authed-section">
+            <div className="blmodal-authed-info">
+              <span className="blmodal-authed-icon">✓</span>
+              <div>
+                <div className="blmodal-authed-title">本地账号已登录</div>
+                {localUid && <div className="blmodal-authed-uid">UID: {localUid}</div>}
               </div>
-            )}
-          </div>
-          <div className={`blmodal-qr-status ${status.type}`}>{status.text}</div>
-          {status.type !== 'expired' && (
-            <button className="blmodal-refresh-link" onClick={fetchQRCode} disabled={loading}>
-              刷新二维码
-            </button>
-          )}
-        </div>
-
-        {/* 已登录时显示退出按钮 */}
-        {isLocalAuthed && (
-          <>
-            <div className="blmodal-divider" />
-            <div className="blmodal-logout-section">
+            </div>
+            <div className="blmodal-authed-actions">
               <button className="blmodal-logout-btn" onClick={handleLogout} disabled={logoutLoading}>
-                {logoutLoading ? '退出中...' : '退出本地 B 站账号'}
+                {logoutLoading ? '退出中...' : '退出登录'}
+              </button>
+              <button className="blmodal-relogin-btn" onClick={handleShowQR}>
+                切换账号
               </button>
             </div>
-          </>
+          </div>
+        ) : (
+          /* 扫码区 */
+          <div className="blmodal-qr-section">
+            <p className="blmodal-qr-tip">使用 B 站 APP 扫码登录（兜底 Cookie，优先级低于 BiliCookie 服务）</p>
+            <div className="blmodal-qr-wrap">
+              {loading && <div className="blmodal-qr-placeholder">生成中...</div>}
+              {!loading && qrData?.qrcode_image && (
+                <img
+                  src={qrData.qrcode_image}
+                  alt="B站扫码登录"
+                  className={`blmodal-qr-img ${status.type === 'expired' ? 'expired' : ''}`}
+                />
+              )}
+              {status.type === 'expired' && (
+                <div className="blmodal-qr-expired-mask">
+                  <button className="blmodal-refresh-btn" onClick={fetchQRCode}>点击刷新</button>
+                </div>
+              )}
+            </div>
+            <div className={`blmodal-qr-status ${status.type}`}>{status.text}</div>
+            {status.type !== 'expired' && (
+              <button className="blmodal-refresh-link" onClick={fetchQRCode} disabled={loading}>
+                刷新二维码
+              </button>
+            )}
+            {isLocalAuthed && (
+              <button className="blmodal-refresh-link" onClick={() => setShowQR(false)} style={{ marginTop: 2 }}>
+                返回已登录状态
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>
