@@ -39,6 +39,7 @@ export default function OverlayPage() {
   const listRef    = useRef(null);
   const autoRef    = useRef(true);
   const prevLenRef = useRef(0);
+  const lockBtnRef = useRef(null);
 
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI;
 
@@ -116,6 +117,27 @@ export default function OverlayPage() {
     setLocked(prev => !prev);
   }
 
+  useEffect(() => {
+    if (!isElectron) return;
+    if (!locked) {
+      window.electronAPI.setOverlayIgnoreMouse(false);
+      return;
+    }
+    window.electronAPI.setOverlayIgnoreMouse(true);
+    function onMouseMove(e) {
+      if (!lockBtnRef.current) return;
+      const r = lockBtnRef.current.getBoundingClientRect();
+      const over = e.clientX >= r.left && e.clientX <= r.right &&
+                   e.clientY >= r.top  && e.clientY <= r.bottom;
+      window.electronAPI.setOverlayIgnoreMouse(!over);
+    }
+    window.addEventListener('mousemove', onMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.electronAPI.setOverlayIgnoreMouse(false);
+    };
+  }, [locked, isElectron]);
+
   function handlePin() {
     const next = !pinned;
     setPinned(next);
@@ -152,6 +174,7 @@ export default function OverlayPage() {
         <div className="ov-header-right no-drag">
           {isElectron && (
             <button
+              ref={lockBtnRef}
               className={`ov-icon-btn ov-lock-btn ${locked ? 'active' : ''}`}
               title={locked ? '点击解锁（防误触已开启）' : '开启防误触锁定'}
               onClick={handleLock}

@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   closeOverlay:     () => ipcRenderer.send('close-overlay'),
   minimizeOverlay:  () => ipcRenderer.send('minimize-overlay'),
   toggleOverlayPin: (v) => ipcRenderer.send('toggle-overlay-pin', v),
+  setOverlayIgnoreMouse: (ignore) => ipcRenderer.send('set-overlay-ignore-mouse', ignore),
 
   openOverlay:    () => ipcRenderer.send('open-overlay'),
   openExternal:   (url) => ipcRenderer.send('open-external', url),

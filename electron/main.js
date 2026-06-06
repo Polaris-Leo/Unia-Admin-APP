@@ -182,6 +182,9 @@ ipcMain.on('close-overlay', () => {
 });
 ipcMain.on('minimize-overlay',   () => overlayWin?.minimize());
 ipcMain.on('toggle-overlay-pin', (_, v) => overlayWin?.setAlwaysOnTop(v, 'screen-saver'));
+ipcMain.on('set-overlay-ignore-mouse', (_, ignore) => {
+  overlayWin?.setIgnoreMouseEvents(ignore, { forward: true });
+});
 ipcMain.on('overlay-snapshot', (_, data) => {
   overlayWin?.webContents.send('overlay-snapshot', data);
 });
