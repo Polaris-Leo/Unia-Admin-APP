@@ -159,6 +159,11 @@ DanmakuPage（主窗口）
 - `--ov-bg-alpha` CSS 变量控制背景透明度
 - 在主界面设置面板调节，通过 `saveConfig` → IPC `config-updated` 同步至悬浮窗
 
+**防误触锁定**
+- 标题栏锁定按钮切换 `locked` state，为 `ov-root` 添加 `ov-locked` class
+- 锁定时通过 CSS `pointer-events: none` 禁用标题栏左侧、弹幕列表、置顶和窗口控制按钮的所有交互
+- 锁定按钮本身始终保持 `pointer-events: auto`，确保可随时解锁
+
 ---
 
 ## 构建流程

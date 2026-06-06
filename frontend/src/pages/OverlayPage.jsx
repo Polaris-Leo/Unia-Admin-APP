@@ -28,6 +28,7 @@ export default function OverlayPage() {
   const [isAutoScroll, setIsAutoScroll] = useState(true);
   const [unread, setUnread] = useState(0);
   const [pinned, setPinned] = useState(true);
+  const [locked, setLocked] = useState(false);
   const [bgOpacity, setBgOpacity] = useState(0.85);
   const [fontSize, setFontSize] = useState(14);
   const [hasSnapshot, setHasSnapshot] = useState(false);
@@ -111,6 +112,10 @@ export default function OverlayPage() {
     setUnread(0);
   }
 
+  function handleLock() {
+    setLocked(prev => !prev);
+  }
+
   function handlePin() {
     const next = !pinned;
     setPinned(next);
@@ -137,7 +142,7 @@ export default function OverlayPage() {
   const waiting = !hasSnapshot || msgs.length === 0;
 
   return (
-    <div className="ov-root">
+    <div className={`ov-root${locked ? ' ov-locked' : ''}`}>
       <div className="ov-header drag">
         <div className="ov-header-left no-drag">
           <span className={`ov-dot ${connected ? 'connected' : 'disconnected'}`} />
@@ -145,6 +150,17 @@ export default function OverlayPage() {
           <span className="ov-count">{msgs.length} 条</span>
         </div>
         <div className="ov-header-right no-drag">
+          {isElectron && (
+            <button
+              className={`ov-icon-btn ov-lock-btn ${locked ? 'active' : ''}`}
+              title={locked ? '点击解锁（防误触已开启）' : '开启防误触锁定'}
+              onClick={handleLock}
+            >
+              <svg className="ov-lock-svg" viewBox="0 0 1024 1024" aria-hidden="true">
+                <path d="M742.4 409.6H716.8V332.8C716.8 205.7728 613.4272 102.4 486.4 102.4S256 205.7728 256 332.8V409.6h-25.6C188.0576 409.6 153.6 444.0576 153.6 486.4v409.6c0 42.3424 34.4576 76.8 76.8 76.8h512c42.3424 0 76.8-34.4576 76.8-76.8v-409.6c0-42.3424-34.4576-76.8-76.8-76.8zM307.2 332.8C307.2 233.984 387.584 153.6 486.4 153.6S665.6 233.984 665.6 332.8V409.6H307.2V332.8z m460.8 563.2a25.6 25.6 0 0 1-25.6 25.6h-512a25.6 25.6 0 0 1-25.6-25.6v-409.6a25.6 25.6 0 0 1 25.6-25.6h512a25.6 25.6 0 0 1 25.6 25.6v409.6z" />
+              </svg>
+            </button>
+          )}
           {isElectron && (
             <button
               className={`ov-icon-btn ${pinned ? 'active' : ''}`}

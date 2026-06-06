@@ -132,9 +132,26 @@ body.unia-overlay-page #root {
   display: block;
   fill: currentColor;
 }
+.ov-lock-svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+  fill: currentColor;
+}
 .ov-win-btn.close:hover {
   background: #e81123;
   color: #fff;
+}
+
+/* ── 防误触锁定状态 ── */
+.ov-root.ov-locked .ov-header-left,
+.ov-root.ov-locked .ov-list-wrap,
+.ov-root.ov-locked .ov-win-btn,
+.ov-root.ov-locked .ov-icon-btn:not(.ov-lock-btn) {
+  pointer-events: none;
+}
+.ov-root.ov-locked .ov-lock-btn {
+  pointer-events: auto;
 }
 
 .no-drag { -webkit-app-region: no-drag; }
